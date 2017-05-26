@@ -1,4 +1,4 @@
-package lobbi44.ctf;
+package lobbi44.tl;
 
 
 import lobbi44.kt.command.CommandEvent;

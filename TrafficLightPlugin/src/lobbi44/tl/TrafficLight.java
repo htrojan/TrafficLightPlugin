@@ -1,4 +1,4 @@
-package lobbi44.ctf;
+package lobbi44.tl;
 
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
@@ -9,9 +9,6 @@ import org.bukkit.configuration.serialization.SerializableAs;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by WE on 23.05.17.
- */
 @SerializableAs("TrafficLight")
 public class TrafficLight extends StateChangeObject
 {
@@ -58,14 +55,14 @@ public class TrafficLight extends StateChangeObject
         red.setType(Material.WOOL);
         if (currentState){
             //Green
-            green.setData(DyeColor.GREEN.getData());
-            red.setData(DyeColor.GRAY.getData());
+            green.setData(DyeColor.GREEN.getWoolData());
+            red.setData(DyeColor.GRAY.getWoolData());
 
             location.getBlock().setType(Material.WOOL);
         }else{
             //Red
-            green.setData(DyeColor.GRAY.getData());
-            red.setData(DyeColor.RED.getData());
+            green.setData(DyeColor.GRAY.getWoolData());
+            red.setData(DyeColor.RED.getWoolData());
         }
     }
 
@@ -81,6 +78,6 @@ public class TrafficLight extends StateChangeObject
     public static TrafficLight deserialize(Map<String, Object> args){
         boolean currentState = (Boolean)args.get("currentState");
         Location location = (Location)args.get("location");
-        return new TrafficLight(location)
+        return new TrafficLight(location);
     }
 }

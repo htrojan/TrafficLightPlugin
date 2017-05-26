@@ -1,9 +1,7 @@
-package lobbi44.ctf;
+package lobbi44.tl;
 
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
-
-import java.util.Map;
 
 /**
  * Created by WE on 23.05.17.

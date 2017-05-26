@@ -1,0 +1,67 @@
+buildscript {
+    ext{
+        kotlin_version = "1.1.1"
+    }
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath group: 'com.github.rodionmoiseev.gradle.plugins', name: 'idea-utils', version: '0.2'
+        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.0-M2'
+    }
+}
+
+plugins {
+    id "com.github.johnrengelman.shadow" version "1.2.3"
+    id "org.jetbrains.kotlin.jvm" version "1.1.1"
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'org.junit.platform.gradle.plugin'
+
+sourceCompatibility = 1.8
+//sourceversion = 1.8
+version = '1.0'
+group= 'lobbi44.bukkit'
+
+
+repositories {
+    mavenCentral()
+    maven{
+        url "https://hub.spigotmc.org/nexus/content/repositories/snapshots/"
+    }
+    maven{
+        url "https://oss.sonatype.org/content/repositories/snapshots"
+    }
+}
+
+
+sourceSets {
+//    main.kotlin.srcDirs = ['src']
+    main.java.srcDirs = ['src']
+    main.resources.srcDirs = ['res']
+    test.java.srcDirs = ['tests']
+//    test.kotlin.srcDirs = ['tests']
+}
+
+group = project.property("group")
+version = project.property("version")
+sourceCompatibility = project.property("sourceversion")
+
+dependencies {
+    compile "lobbi44.bukkit:CommandFramework"
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+
+    testCompile("org.junit.jupiter:junit-jupiter-api:5.0.0-M2")
+    testRuntime("org.junit.jupiter:junit-jupiter-engine:5.0.0-M2")
+}
+
+shadowJar{
+    dependencies{
+        include (dependency('lobbi44.bukkit::'))
+        include (dependency('org.jetbrains.kotlin::'))
+    }
+}

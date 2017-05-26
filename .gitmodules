@@ -1,0 +1,3 @@
+[submodule "CommandFramework"]
+	path = CommandFramework
+	url = https://github.com/lobbi44/CommandFramework

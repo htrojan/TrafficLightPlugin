@@ -9,6 +9,7 @@ import org.bukkit.configuration.serialization.SerializableAs;
 import java.util.HashMap;
 import java.util.Map;
 
+@SuppressWarnings("deprecation")
 @SerializableAs("TrafficLight")
 public class TrafficLight extends StateChangeObject
 {
@@ -24,8 +25,11 @@ public class TrafficLight extends StateChangeObject
         location.add(0, 1, 0);
         red = location.getBlock();
         location.add(0, -1, 0);
+    }
 
-        update();
+    private TrafficLight(Location location, boolean currentState){
+        this(location);
+        this.currentState = currentState;
     }
 
 
@@ -55,14 +59,13 @@ public class TrafficLight extends StateChangeObject
         red.setType(Material.WOOL);
         if (currentState){
             //Green
-            green.setData(DyeColor.GREEN.getWoolData());
             red.setData(DyeColor.GRAY.getWoolData());
+            green.setData(DyeColor.LIME.getWoolData());
 
-            location.getBlock().setType(Material.WOOL);
         }else{
             //Red
-            green.setData(DyeColor.GRAY.getWoolData());
             red.setData(DyeColor.RED.getWoolData());
+            green.setData(DyeColor.GRAY.getWoolData());
         }
     }
 
@@ -78,6 +81,6 @@ public class TrafficLight extends StateChangeObject
     public static TrafficLight deserialize(Map<String, Object> args){
         boolean currentState = (Boolean)args.get("currentState");
         Location location = (Location)args.get("location");
-        return new TrafficLight(location);
+        return new TrafficLight(location, currentState);
     }
 }

@@ -11,4 +11,5 @@ public abstract class StateChangeObject implements ConfigurationSerializable{
     abstract void setState(String state);
     abstract void nextState();
     abstract void update();
+
 }

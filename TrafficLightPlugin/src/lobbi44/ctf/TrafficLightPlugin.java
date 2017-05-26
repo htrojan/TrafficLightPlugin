@@ -17,7 +17,7 @@ import java.util.List;
 /**
  *
  */
-public class CtfPlugin extends JavaPlugin {
+public class TrafficLightPlugin extends JavaPlugin {
 
     static {
         ConfigurationSerialization.registerClass(StateChangeObject.class);
@@ -25,12 +25,11 @@ public class CtfPlugin extends JavaPlugin {
     }
 
     private CommandFramework framework;
-    private List<StateChangeObject> states;
+    private List<StateChangeObject> states = new ArrayList<>();
 
     @Override
     public void onEnable() {
         getLogger().info("onEnable() called");
-        states = new ArrayList<>();
         initCommandFramework();
     }
 

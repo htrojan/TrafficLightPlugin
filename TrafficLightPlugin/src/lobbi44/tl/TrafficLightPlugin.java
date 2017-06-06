@@ -4,8 +4,10 @@ package lobbi44.tl;
 import lobbi44.kt.command.CommandEvent;
 import lobbi44.kt.command.CommandFramework;
 import lobbi44.kt.command.annotations.Command;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
@@ -24,12 +26,13 @@ import java.util.List;
 public class TrafficLightPlugin extends JavaPlugin {
 
     static {
-        ConfigurationSerialization.registerClass(StateChangeObject.class);
-        ConfigurationSerialization.registerClass(TrafficLight.class, "TrafficLight");
+        ConfigurationSerialization.registerClass(IStateChangeObject.class);
+        ConfigurationSerialization.registerClass(TrafficLight.class, "TrafficLighht");
+        ConfigurationSerialization.registerClass(FrameLight.class, "FrameLight");
     }
 
     private CommandFramework framework;
-    private List<StateChangeObject> states = null;
+    private List<IStateChangeObject> states = null;
     private File customConfigFile = new File(getDataFolder(), "TrafficLights.yml");
     private FileConfiguration config = null;
 
@@ -39,7 +42,7 @@ public class TrafficLightPlugin extends JavaPlugin {
         initCommandFramework();
 
         config = YamlConfiguration.loadConfiguration(customConfigFile);
-        states = (List<StateChangeObject>) config.getList("activeLights");
+        states = (List<IStateChangeObject>) config.getList("activeLights");
         if (states == null)
             states = new ArrayList<>();
         updateAllLights();
@@ -67,13 +70,16 @@ public class TrafficLightPlugin extends JavaPlugin {
         HashSet<Material> transparent = new HashSet<>();
         transparent.add(Material.AIR);
         Block block = player.getTargetBlock(transparent, 10);
-        states.add(new TrafficLight(block.getLocation()));
+        Location loc = block.getLocation();
+        //makes the light face towards the creator
+        loc.setYaw((loc.getYaw()+180f)%360f);
+        states.add(new FrameLight(loc));
         return true;
     }
 
     @Command(name = "tl.switch", permission = "tl.switch", description = "Switches all traffic light")
     public boolean switchAllLights(CommandEvent event){
-        for (StateChangeObject tl :
+        for (IStateChangeObject tl :
                 states) {
             tl.nextState();
             tl.update();
@@ -104,7 +110,7 @@ public class TrafficLightPlugin extends JavaPlugin {
     }
 
     private void updateAllLights(){
-        for (StateChangeObject tl :
+        for (IStateChangeObject tl :
                 states) {
             tl.update();
         }

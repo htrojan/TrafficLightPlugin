@@ -11,11 +11,11 @@ import java.util.Map;
 
 @SuppressWarnings("deprecation")
 @SerializableAs("TrafficLight")
-public class TrafficLight extends StateChangeObject
+public class TrafficLight implements IStateChangeObject
 {
     private Location location;
-    private final static String RED = "red";
-    private final static String GREEN = "green";
+    public final static String RED = "red";
+    public final static String GREEN = "green";
     private boolean currentState = false;
     private Block red, green;
 

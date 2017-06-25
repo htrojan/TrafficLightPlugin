@@ -21,8 +21,9 @@ public class LightCommands {
     private List<IStateChangeObject> traffigLights;
     private Selector<IStateChangeObject> selectedLights = new Selector<>();
 
-    LightCommands(TrafficLightPlugin plugin){
+    LightCommands(TrafficLightPlugin plugin, List<IStateChangeObject> traffigLights){
         this.plugin = plugin;
+        this.traffigLights = traffigLights;
     }
 
 

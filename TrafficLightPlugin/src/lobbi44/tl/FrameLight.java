@@ -8,11 +8,13 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Wool;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,7 +27,7 @@ public class FrameLight implements IStateChangeObject {
     private boolean state;
     private Location location;
     private Block top, bottom;
-    private Location frameTopLoc, frameBottomLoc;
+    private Location frameTopLoc, frameBotLoc;
     private BlockFace facing;
     private ItemFrame frameTop, frameBot;
 
@@ -38,8 +40,26 @@ public class FrameLight implements IStateChangeObject {
         this.state = currentState;
         this.facing = Util.yawToBlockface(location.getYaw());
 
+        setBlockLocs(location);
+        searchForItemFrames();
+
+    }
+
+    private void searchForItemFrames() {
+        Collection<Entity> entities = this.location.getWorld().getNearbyEntities(frameBotLoc,1, 2, 1);
+        for (Entity entity : entities) {
+            if (entity.getType() == EntityType.ITEM_FRAME){
+                if (Util.BlockLocationEquals(entity.getLocation(), frameTopLoc))
+                    frameTop = (ItemFrame) entity;
+                else if (Util.BlockLocationEquals(entity.getLocation(), frameBotLoc))
+                    frameBot = (ItemFrame) entity;
+            }
+        }
+    }
+
+    private void setBlockLocs(Location location) {
         bottom = location.getBlock();
-        frameBottomLoc = location.add(facing.getModX(), facing.getModY(), facing.getModZ()).clone();
+        frameBotLoc = location.add(facing.getModX(), facing.getModY(), facing.getModZ()).clone();
         location.add(-facing.getModX(), -facing.getModY(), -facing.getModZ());
 
         top = location.add(0, 1, 0).getBlock();
@@ -90,12 +110,17 @@ public class FrameLight implements IStateChangeObject {
         }
     }
 
-    private void renewEntities(){
+    @Override
+    public Location getLocation() {
+        return location;
+    }
+
+    private void renewEntities() {
         if (frameTop == null || frameTop.isDead())
             frameTop = (ItemFrame) location.getWorld().spawnEntity(frameTopLoc, EntityType.ITEM_FRAME);
 
         if (frameBot == null || frameBot.isDead())
-            frameBot = (ItemFrame) location.getWorld().spawnEntity(frameBottomLoc, EntityType.ITEM_FRAME);
+            frameBot = (ItemFrame) location.getWorld().spawnEntity(frameBotLoc, EntityType.ITEM_FRAME);
 
     }
 

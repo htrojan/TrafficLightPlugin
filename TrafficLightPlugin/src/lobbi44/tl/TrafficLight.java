@@ -69,6 +69,11 @@ public class TrafficLight implements IStateChangeObject
         }
     }
 
+    @Override
+    public Location getLocation() {
+        return location;
+    }
+
 
     @Override
     public Map<String, Object> serialize() {

@@ -12,9 +12,6 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 
-/**
- * Created by HT on 25.06.2017.
- */
 public class LightCommands {
 
     private TrafficLightPlugin plugin;

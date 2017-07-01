@@ -26,7 +26,7 @@ public class TrafficLightPlugin extends JavaPlugin {
     private CommandFramework framework;
     private List<IStateChangeObject> traffigLights = null;
     private File customConfigFile = new File(getDataFolder(), "TrafficLights.yml");
-    private FileConfiguration config = null;
+    private FileConfiguration lightSave = null;
 
 
     @Override
@@ -34,8 +34,8 @@ public class TrafficLightPlugin extends JavaPlugin {
         getLogger().info("onEnable() called");
         initCommandFramework();
 
-        config = YamlConfiguration.loadConfiguration(customConfigFile);
-        traffigLights = (List<IStateChangeObject>) config.getList("activeLights");
+        lightSave = YamlConfiguration.loadConfiguration(customConfigFile);
+        traffigLights = (List<IStateChangeObject>) lightSave.getList("activeLights");
         if (traffigLights == null)
             traffigLights = new ArrayList<>();
         updateAllLights();
@@ -58,8 +58,8 @@ public class TrafficLightPlugin extends JavaPlugin {
     }
 
     void saveLights() throws IOException {
-        config.set("activeLights", traffigLights);
-        config.save(customConfigFile);
+        lightSave.set("activeLights", traffigLights);
+        lightSave.save(customConfigFile);
     }
 
     void updateAllLights() {

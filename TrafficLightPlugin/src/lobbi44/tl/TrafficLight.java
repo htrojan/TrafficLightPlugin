@@ -11,36 +11,37 @@ import java.util.Map;
 
 @SuppressWarnings("deprecation")
 @SerializableAs("TrafficLight")
-public class TrafficLight implements IStateChangeObject
-{
-    private Location location;
-    public final static String RED = "red";
-    public final static String GREEN = "green";
-    private boolean currentState = false;
+public class TrafficLight extends TimedTrafficLight {
+
+
     private Block red, green;
 
-    public TrafficLight(Location location){
-        this.location = location;
+
+    public TrafficLight(Location location) {
+        this(location, true, 0);
+    }
+
+    /**
+     * This is only used during deserialization for restoring the previously used timer
+     *
+     * @param timer The elapsed time to use
+     */
+    private TrafficLight(Location location, boolean currentState, int timer) {
+        super(location, currentState, timer);
+        this.currentState = currentState;
         green = location.getBlock();
         location.add(0, 1, 0);
         red = location.getBlock();
         location.add(0, -1, 0);
     }
 
-    private TrafficLight(Location location, boolean currentState){
-        this(location);
-        this.currentState = currentState;
-    }
 
 
-    @Override
-    public void setState(String state) {
-        switch (state){
-            case RED:
-                currentState = false;
-            case GREEN:
-                currentState = true;
-        }
+    public static TrafficLight deserialize(Map<String, Object> args) {
+        boolean currentState = (Boolean) args.get("state");
+        Location location = (Location) args.get("location");
+        int timer = (int) args.get("timer");
+        return new TrafficLight(location, currentState, timer);
     }
 
     @Override
@@ -49,43 +50,18 @@ public class TrafficLight implements IStateChangeObject
     }
 
     @Override
-    public void nextState() {
-        currentState = !currentState;
-    }
-
-    @Override
     public void update() {
         green.setType(Material.WOOL);
         red.setType(Material.WOOL);
-        if (currentState){
+        if (currentState) {
             //Green
             red.setData(DyeColor.GRAY.getWoolData());
             green.setData(DyeColor.LIME.getWoolData());
 
-        }else{
+        } else {
             //Red
             red.setData(DyeColor.RED.getWoolData());
             green.setData(DyeColor.GRAY.getWoolData());
         }
-    }
-
-    @Override
-    public Location getLocation() {
-        return location;
-    }
-
-
-    @Override
-    public Map<String, Object> serialize() {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("location", location);
-        map.put("currentState", currentState);
-        return map;
-    }
-
-    public static TrafficLight deserialize(Map<String, Object> args){
-        boolean currentState = (Boolean)args.get("currentState");
-        Location location = (Location)args.get("location");
-        return new TrafficLight(location, currentState);
     }
 }

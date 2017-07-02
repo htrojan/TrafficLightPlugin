@@ -6,6 +6,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitScheduler;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,12 +20,12 @@ public class TrafficLightPlugin extends JavaPlugin {
 
     static {
         ConfigurationSerialization.registerClass(IStateChangeObject.class);
-        ConfigurationSerialization.registerClass(TrafficLight.class, "TrafficLighht");
+        ConfigurationSerialization.registerClass(TrafficLight.class, "TrafficLight");
         ConfigurationSerialization.registerClass(FrameLight.class, "FrameLight");
     }
 
     private CommandFramework framework;
-    private List<IStateChangeObject> traffigLights = null;
+    private List<IStateChangeObject> trafficLights = null;
     private File customConfigFile = new File(getDataFolder(), "TrafficLights.yml");
     private FileConfiguration lightSave = null;
 
@@ -32,13 +33,27 @@ public class TrafficLightPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         getLogger().info("onEnable() called");
-        initCommandFramework();
 
         lightSave = YamlConfiguration.loadConfiguration(customConfigFile);
-        traffigLights = (List<IStateChangeObject>) lightSave.getList("activeLights");
-        if (traffigLights == null)
-            traffigLights = new ArrayList<>();
+        trafficLights = (List<IStateChangeObject>) lightSave.getList("activeLights");
+        if (trafficLights == null) {
+            trafficLights = new ArrayList<>();
+        }
+        initCommandFramework();
         updateAllLights();
+        startLightTimer();
+    }
+
+    /**
+     * Starts a synchronous task that will execute every second and update all lights
+     */
+    private void startLightTimer() {
+        BukkitScheduler scheduler = this.getServer().getScheduler();
+        scheduler.scheduleSyncRepeatingTask(this, () -> {
+            for (IStateChangeObject light : trafficLights) {
+                light.tick();
+            }
+        }, 0L, 20L);
     }
 
     @Override
@@ -53,18 +68,18 @@ public class TrafficLightPlugin extends JavaPlugin {
 
     private void initCommandFramework() {
         framework = new CommandFramework(this, this.getLogger());
-        framework.registerCommands(new LightCommands(this, traffigLights));
+        framework.registerCommands(new LightCommands(this, trafficLights));
         framework.registerHelpTopic("Ampel");
     }
 
     void saveLights() throws IOException {
-        lightSave.set("activeLights", traffigLights);
+        lightSave.set("activeLights", trafficLights);
         lightSave.save(customConfigFile);
     }
 
     void updateAllLights() {
         for (IStateChangeObject tl :
-                traffigLights) {
+                trafficLights) {
             tl.update();
         }
     }

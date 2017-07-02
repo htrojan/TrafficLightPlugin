@@ -12,5 +12,10 @@ public interface IStateChangeObject extends ConfigurationSerializable{
     void setState(String state);
     void nextState();
     void update();
+    /**
+     * This method is called once every second for every IStateChangeObject.
+     * Used for switching the state in time intervals
+     */
+    void tick();
     Location getLocation();
 }

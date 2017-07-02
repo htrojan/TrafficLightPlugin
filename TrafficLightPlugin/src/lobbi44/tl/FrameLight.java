@@ -19,25 +19,21 @@ import java.util.HashMap;
 import java.util.Map;
 
 @SerializableAs("FrameLight")
-public class FrameLight implements IStateChangeObject {
+public class FrameLight extends TimedTrafficLight {
 
-    public static final String RED = "red";
-    public static final String GREEN = "green";
-
-    private boolean state;
-    private Location location;
     private Block top, bottom;
     private Location frameTopLoc, frameBotLoc;
     private BlockFace facing;
     private ItemFrame frameTop, frameBot;
 
     public FrameLight(Location location) {
-        this(false, location);
+        this(false, location, 0);
     }
 
-    private FrameLight(boolean currentState, Location location) {
+    private FrameLight(boolean currentState, Location location, int timer) {
+        super(location, currentState, timer);
         this.location = location;
-        this.state = currentState;
+        this.currentState = currentState;
         this.facing = Util.yawToBlockface(location.getYaw());
 
         setBlockLocs(location);
@@ -69,20 +65,6 @@ public class FrameLight implements IStateChangeObject {
         location.add(0, -1, 0);
     }
 
-    @Override
-    public void setState(String state) {
-        switch (state) {
-            case RED:
-                this.state = false;
-            case GREEN:
-                this.state = true;
-        }
-    }
-
-    @Override
-    public void nextState() {
-        state = !state;
-    }
 
     @Override
     public void update() {
@@ -98,8 +80,7 @@ public class FrameLight implements IStateChangeObject {
 
         renewEntities();
 
-        // location.getWorld().enti
-        if (state) {
+        if (isGreen()) {
             //green
             frameTop.setItem(null);
             frameBot.setItem(greenWool);
@@ -110,10 +91,6 @@ public class FrameLight implements IStateChangeObject {
         }
     }
 
-    @Override
-    public Location getLocation() {
-        return location;
-    }
 
     private void renewEntities() {
         if (frameTop == null || frameTop.isDead())
@@ -124,23 +101,9 @@ public class FrameLight implements IStateChangeObject {
 
     }
 
-    /**
-     * Creates a Map representation of this class.
-     * <p>
-     * This class must provide a method to restore this class, as defined in
-     * the {@link ConfigurationSerializable} interface javadocs.
-     *
-     * @return Map containing the current state of this class
-     */
-    @Override
-    public Map<String, Object> serialize() {
-        Map<String, Object> map = new HashMap<>();
-        map.put("location", location);
-        map.put("state", state);
-        return map;
-    }
+
 
     public static FrameLight deserialize(Map<String, Object> args) {
-        return new FrameLight((boolean) args.get("state"), (Location) args.get("location"));
+        return new FrameLight((boolean) args.get("state"), (Location) args.get("location"), (int) args.get("timer"));
     }
 }

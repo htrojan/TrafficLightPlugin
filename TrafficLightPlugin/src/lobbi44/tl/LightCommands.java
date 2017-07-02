@@ -15,12 +15,12 @@ import java.util.List;
 public class LightCommands {
 
     private TrafficLightPlugin plugin;
-    private List<IStateChangeObject> traffigLights;
+    private List<IStateChangeObject> trafficLights;
     private Selector<IStateChangeObject> selectedLights = new Selector<>();
 
-    LightCommands(TrafficLightPlugin plugin, List<IStateChangeObject> traffigLights){
+    LightCommands(TrafficLightPlugin plugin, List<IStateChangeObject> trafficLights){
         this.plugin = plugin;
-        this.traffigLights = traffigLights;
+        this.trafficLights = trafficLights;
     }
 
 
@@ -34,7 +34,7 @@ public class LightCommands {
         //makes the light face towards the creator
         loc.setYaw((loc.getYaw() + 180f) % 360f);
         IStateChangeObject light = new FrameLight(loc);
-        traffigLights.add(light);
+        trafficLights.add(light);
         light.update();
         return true;
     }
@@ -42,7 +42,7 @@ public class LightCommands {
     @Command(name = "tl.switchAll", permission = "tl.switchAll", description = "Switches all traffic light")
     public boolean switchAllLights(CommandEvent event) {
         for (IStateChangeObject tl :
-                traffigLights) {
+                trafficLights) {
             tl.nextState();
             tl.update();
         }
@@ -92,7 +92,7 @@ public class LightCommands {
         //todo: Write better search algorithm PLEASE!!!
         Location blockLocation = block.getLocation();
         plugin.getLogger().info("Location = " + blockLocation.toString());
-        for (IStateChangeObject light : traffigLights) {
+        for (IStateChangeObject light : trafficLights) {
             if (light.getLocation().getBlockX() == blockLocation.getBlockX() && light.getLocation().getBlockY() == blockLocation.getBlockY()
                     && light.getLocation().getBlockZ() == blockLocation.getBlockZ()) {
                 selectedLights.select(player, light);

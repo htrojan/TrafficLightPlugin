@@ -32,7 +32,7 @@ public class LightCommands {
         Block block = player.getTargetBlock(transparent, 10);
         Location loc = block.getLocation();
         //makes the light face towards the creator
-        loc.setYaw((loc.getYaw() + 180f) % 360f);
+        loc.setYaw((player.getLocation().getYaw() + 180f) % 360f);
         IStateChangeObject light = new FrameLight(loc);
         trafficLights.add(light);
         light.update();

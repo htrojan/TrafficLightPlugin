@@ -28,6 +28,12 @@ public abstract class TimedTrafficLight implements IStateChangeObject{
     private boolean paused = false;
 
     /**
+     * States if the timings have been changed this session and have to be saved
+     * (they are non-default)
+     */
+    private boolean changedTimings;
+
+    /**
      * The location where the light is build
      */
     protected Location location;
@@ -56,6 +62,19 @@ public abstract class TimedTrafficLight implements IStateChangeObject{
 
     public boolean isRed(){
         return !currentState;
+    }
+
+    public void setGreenTime(int greenTime){
+        this.greenTime = greenTime;
+    }
+
+    public void setRedTime(int redTime){
+        this.redTime = redTime;
+    }
+
+    public void setGreenRedTime(int greenTime, int redTime){
+        this.greenTime = greenTime;
+        this.redTime = redTime;
     }
 
     @Override

@@ -6,6 +6,7 @@ import lobbi44.tl.util.Selector;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.io.IOException;
@@ -16,9 +17,9 @@ public class LightCommands {
 
     private TrafficLightPlugin plugin;
     private List<IStateChangeObject> trafficLights;
-    private Selector<IStateChangeObject> selectedLights = new Selector<>();
+    private Selector<IStateChangeObject> selectedLight = new Selector<>();
 
-    LightCommands(TrafficLightPlugin plugin, List<IStateChangeObject> trafficLights){
+    LightCommands(TrafficLightPlugin plugin, List<IStateChangeObject> trafficLights) {
         this.plugin = plugin;
         this.trafficLights = trafficLights;
     }
@@ -51,7 +52,7 @@ public class LightCommands {
 
     @Command(name = "tl.switch", permission = "tl.switch", description = "Switches the selected traffic light")
     public boolean switchLight(CommandEvent event) {
-        IStateChangeObject light = selectedLights.getSelected((Player) event.getCommandSender());
+        IStateChangeObject light = selectedLight.getSelected((Player) event.getCommandSender());
         light.nextState();
         light.update();
         return true;
@@ -78,7 +79,7 @@ public class LightCommands {
     @Command(name = "tl.update", description = "updates the selected light")
     public boolean updateSelectedLight(CommandEvent event) {
         Player player = ((Player) event.getCommandSender());
-        selectedLights.getSelected(player).update();
+        selectedLight.getSelected(player).update();
         return true;
     }
 
@@ -95,12 +96,47 @@ public class LightCommands {
         for (IStateChangeObject light : trafficLights) {
             if (light.getLocation().getBlockX() == blockLocation.getBlockX() && light.getLocation().getBlockY() == blockLocation.getBlockY()
                     && light.getLocation().getBlockZ() == blockLocation.getBlockZ()) {
-                selectedLights.select(player, light);
+                selectedLight.select(player, light);
                 player.sendMessage("Selected a new traffic light");
                 return true;
             }
         }
         player.sendMessage("There is no light to select");
         return false;
+    }
+
+    @Command(name = "tl.timings", description = "sets the timings of the selected light", usage = "/<command> greenSeconds redSeconds")
+    public boolean setLightTimings(CommandEvent event) {
+        if (event.getArgs().size() != 2) return false;
+
+        Player player = (Player) event.getCommandSender();
+        int green = Integer.valueOf(event.getArgs().get(1));
+        int red = Integer.valueOf(event.getArgs().get(2));
+
+        IStateChangeObject selected = selectedLight.getSelected(player);
+        if (!(selected instanceof TimedTrafficLight)) {
+            event.getCommandSender().sendMessage("This object has no timings that could be changed");
+            return false;
+        }
+        TimedTrafficLight light = (TimedTrafficLight) selected;
+        light.setGreenRedTime(green, red);
+        return true;
+    }
+
+    @Command(name = "tl.delete", description = "deletes the selected light")
+    public boolean deleteLight(CommandEvent event) {
+        IStateChangeObject selected = getSelectedLight(event.getCommandSender());
+        if (selected == null){
+            event.getCommandSender().sendMessage("There is nothing selected");
+            return false;
+        }
+        trafficLights.remove(selected);
+        return true;
+    }
+
+    private IStateChangeObject getSelectedLight(CommandSender sender) {
+        if (sender instanceof Player)
+            return selectedLight.getSelected((Player) sender);
+        else return null;
     }
 }
